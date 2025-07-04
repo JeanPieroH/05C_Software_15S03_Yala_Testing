@@ -1,0 +1,15 @@
+meta {
+  name: Listar mis cuentas
+  type: http
+  seq: 1
+}
+
+get {
+  url: http://localhost:8000/api/accounts/
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjcGF6QHBydWViYS5jb20iLCJleHAiOjE3NTE2NjI2NjF9.KwyUMQ2yJ0geK8aqNazmZHqN0tbJcBGEW3hK34ZIjYE
+}

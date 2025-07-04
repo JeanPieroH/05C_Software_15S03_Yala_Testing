@@ -1,0 +1,23 @@
+meta {
+  name: Change PEN to USD
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8000/api/transactions
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt}}
+}
+
+body:json {
+  {
+    "source_account_id" : 2,
+    "destination_account_id" : 1,
+    "amount" : 20
+  }
+}

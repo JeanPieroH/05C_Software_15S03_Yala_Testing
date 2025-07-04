@@ -1,0 +1,15 @@
+meta {
+  name: Get Transactions
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:8000/api/transactions
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt}}
+}
