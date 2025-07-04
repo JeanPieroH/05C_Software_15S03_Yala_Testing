@@ -13,7 +13,7 @@ from core.security import verify_password, create_access_token, hash_password
 # Let's assume it's patchable or we define a test value.
 
 # Test value for token expiration
-TEST_ACCESS_TOKEN_EXPIRE_MINUTES = 30
+TEST_ACCESS_TOKEN_EXPIRE_MINUTES = 1440
 
 @pytest.fixture
 def mock_db_session():
@@ -187,37 +187,3 @@ def test_auth_service_class_name():
     # assert AuthenticationService is None # Or check it doesn't exist / raises ImportError.
     # This is mostly useful if refactoring from an old name.
     # For now, just asserting the current name is fine.
-
-# It's good practice to ensure mocks are reset or don't leak between tests.
-# Pytest fixtures handle this well for fixture-scoped mocks.
-# For module-level patches (like ACCESS_TOKEN_EXPIRE_MINUTES), ensure they are correctly managed.
-# The @patch decorator on the fixture `auth_service` scopes the patch to that fixture's lifecycle.
-# If `ACCESS_TOKEN_EXPIRE_MINUTES` was imported at the top of `services.auth_service`
-# like `from config import ACCESS_TOKEN_EXPIRE_MINUTES`, then patching
-# `services.auth_service.ACCESS_TOKEN_EXPIRE_MINUTES` is the correct way.
-# If it was `import config` and then `config.ACCESS_TOKEN_EXPIRE_MINUTES`,
-# you'd patch `services.auth_service.config.ACCESS_TOKEN_EXPIRE_MINUTES`.
-# The current patch `services.auth_service.ACCESS_TOKEN_EXPIRE_MINUTES` assumes it's directly available
-# in the auth_service module's namespace. If `config.py` is simple and directly imported,
-# this will work. If `config.py` uses `python-dotenv` to load at runtime, testing might need
-# environment variable manipulation or more complex patching of the config loading mechanism.
-# Given `from config import ACCESS_TOKEN_EXPIRE_MINUTES` in `auth_service.py`, the patch is correct.
-# `patch('services.auth_service.ACCESS_TOKEN_EXPIRE_MINUTES', ...)` modifies it where it's used.
-
-# Example of how to test the filter conditions more precisely if needed:
-# from sqlalchemy.sql.expression import column
-# def test_authenticate_user_filter_precision(auth_service, mock_db_session, mock_db_user):
-#     mock_db_session.query(User).filter.return_value.first.return_value = mock_db_user
-#     auth_service.authenticate_user(mock_db_user.email, "password")
-#
-#     # Get the actual SQLAlchemy expression passed to filter
-#     filter_expression = mock_db_session.query(User).filter.call_args[0][0]
-#
-#     # Check the left side of the binary expression
-#     assert filter_expression.left.name == User.email.name # or .key
-#     # Check the right side (the value)
-#     assert filter_expression.right.value == mock_db_user.email
-#     # Check the operator if necessary (e.g., equality)
-#     # This level of detail can be brittle if the query structure changes slightly.
-#     # Usually, checking the side effects (correct user returned, mocks called) is sufficient.
-#     pass

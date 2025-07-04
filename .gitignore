@@ -9,6 +9,7 @@ venv.bak/
 
 # Python
 __pycache__/
+.pytest_cache/
 *.py[cod]
 *$py.class
 *.so
@@ -86,3 +87,5 @@ backend/users.db
 
 ### Mac OS ###
 .DS_Store
+
+htmlcov/

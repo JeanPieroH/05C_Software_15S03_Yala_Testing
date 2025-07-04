@@ -87,11 +87,6 @@ def send_email(to_email: str, subject: str, body_html: str, attachments: dict[st
             print("Email sent successfully")
         return True
 
-    except UnicodeEncodeError as uee:
-        print(f"Unicode Encoding Error: {uee}")
-        print(f"Error position: {uee.start}-{uee.end}, object: {repr(uee.object[uee.start:uee.end])}")
-        print(f"Complete problematic string: {repr(uee.object)}")
-        return False
     except Exception as e:
         print(f"Error de correo: {e}")
         print(f"- Error type: {type(e).__name__}")
