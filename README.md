@@ -96,12 +96,12 @@ Las pruebas de rendimiento se realizan utilizando **Apache JMeter** para validar
 #### 🔄 Secuencia de Pruebas Diseñada
 
 **1. Depósitos Iniciales**
-- 1000 depósitos de $100 cada uno
+- 1000 depósitos de 10 cada uno
 - Distribución entre diferentes cuentas
 - Validación de saldos incrementales
 
 **2. Transferencias Simples**
-- 1000 transferencias de $50 cada una
+- 1000 transferencias de 20 cada una
 - Entre cuentas con la misma moneda
 - Verificación de balances actualizados
 
