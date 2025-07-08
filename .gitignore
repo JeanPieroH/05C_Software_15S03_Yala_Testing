@@ -88,4 +88,3 @@ backend/users.db
 ### Mac OS ###
 .DS_Store
 
-htmlcov/

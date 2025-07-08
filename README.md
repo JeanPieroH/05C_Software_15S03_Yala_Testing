@@ -1,8 +1,7 @@
-# 💸 YALA - Sistema de Gestión de Cuentas y Transacciones
+# 💸 YALA - Testing Documentation
 
 ## 📋 Descripción del Proyecto
-YALA es una aplicación de gestión financiera que permite a los usuarios administrar cuentas en diferentes monedas, realizar transacciones entre ellas y gestionar tipos de cambio.
-
+Este documento describe la implementación de pruebas unitarias y de rendimiento para el sistema de transferencias bancarias.
 ---
 
 ## 🚀 Configuración Inicial
@@ -46,45 +45,120 @@ EXCHANGE_API2_KEY=  # No es necesario configurar esta variable
 uvicorn main:app --reload
 ```
 
+## 🧪 Pruebas Unitarias
+
+### Descripción
+
+Las pruebas unitarias se han implementado utilizando **PyTest** para garantizar la calidad y funcionalidad de los servicios del sistema. Se ha logrado un **100% de cobertura de código** en todos los servicios principales.
+
+### Servicios Probados
+
+- **TransactionService**: Manejo de transacciones, transferencias y validaciones
+- **AccountService**: Gestión de cuentas bancarias
+- **UserService**: Autenticación y gestión de usuarios
+- **ExchangeService**: Conversión de monedas y tasas de cambio
+- **AuthService**: Emision y recibimiento de tokens
+- **EmailService**: Emision y recibimiento de email
+
+
+### 1️⃣ Ejecutar el comando de pytest
+
+```bash
+pytest --cov=. --cov-report=html
+```
+Se mostrará una ejecución en consola como se muestra, los test son cumplidos satisfatoriamente
+
+<div align="center">
+    <img src="./images/08.jpg" alt="" style="width: 80%;">
+</div>
+
+### 2️⃣ Revision de Reporte
+
+Se generará una ruta `hmtlcov\index.html`, el cual también se encuentra en el repositorio, aunque puede generarlo nuevamente
+
+Al abrir `index.html` mostrará que la cobertura de los servicios es del `100%`
+
+<div align="center">
+    <img src="./images/07.jpg" alt="" style="width: 80%;">
+</div>
 ---
 
-## ⚙️ Requisitos de Implementación
+## 🚀 Pruebas de Performance
 
-La implementación de transacciones debería:
+### Descripción
 
-1. ✅ Validar que la cuenta de origen pertenece al usuario actual
-2. 💰 Comprobar si hay saldo suficiente en la cuenta de origen
-3. 🔄 Utilizar el servicio de cambio para calcular la tasa de conversión si las monedas son diferentes
-4. 📊 Actualizar los saldos de ambas cuentas
-5. 📝 Crear un registro de transacción
-6. 📧 Enviar notificaciones por correo electrónico tanto al remitente como al destinatario
+Las pruebas de rendimiento se realizan utilizando **Apache JMeter** para validar el comportamiento del sistema bajo diferentes cargas de trabajo y escenarios de uso concurrente.
 
----
 
-## 🗄️ Esquema de Base de Datos
 
-- **👤 users**: Información de usuario (id, username, email, hashed_password, full_name)
-- **💵 currencies**: Información de monedas (id, code, name)
-- **🏦 accounts**: Cuentas de usuario (id, user_id, currency_id, balance)
-- **💱 transactions**: Registros de transacciones (id, sender_id, receiver_id, source_account_id, destination_account_id, etc.)
+### Escenarios de Prueba
 
----
+#### 🔄 Secuencia de Pruebas Diseñada
 
-## 🧪 Tutorial Bruno
+**1. Depósitos Iniciales**
+- 1000 depósitos de $100 cada uno
+- Distribución entre diferentes cuentas
+- Validación de saldos incrementales
 
-- **📁 collection**: una vez descargada la aplicación, haz clic en los 3 puntos en la esquina derecha de la aplicación, al costado del perro. Ahí selecciona **Open Collection** y elige la carpeta **YALA-test**
-- **🔧 environment**: Una vez abierta la carpeta en Bruno, haz clic en la carpeta y luego selecciona un **environment**. Como no habrá ninguno, selecciona "create environment" y agrega la variable **jwt** en **Add Variable**.
+**2. Transferencias Simples**
+- 1000 transferencias de $50 cada una
+- Entre cuentas con la misma moneda
+- Verificación de balances actualizados
 
----
+**3. Transferencias Multi-moneda**
+- Transferencias entre diferentes monedas (USD ↔ PEN, EUR ↔ USD)
+- Validación de tasas de cambio aplicadas
+- Verificación de consistencia en conversiones
 
-## 📱 Uso visual de la aplicación
+**4. Transferencias de Ida y Vuelta**
+- Transferencia A → B (con conversión de moneda)
+- Transferencia B → A (conversión inversa)
+- Validación de que los montos finales son consistentes
 
-Se presenta un recorrido por las secciones del frontend:
+### 1️⃣ Ejecución de JMeter
 
-### **Visualización en la Aplicación:**
-![Uso de la aplicación](./images/01.png)
-![Uso de la aplicación](./images/02.png)
-![Uso de la aplicación](./images/03.png)
-![Uso de la aplicación](./images/04.png)
-![Uso de la aplicación](./images/05.png)
-![Uso de la aplicación](./images/06.png)
+Se descomprime `apache-jmeter-5.63.zip` donde se encuentra el compilado de la herramienta `JMeter`
+
+Se ejecuta `\apache-jmeter-5.6.3\bin\jmeter.bat`
+
+### 2️⃣ Importación de configuraciones de ejecucion
+
+Importamos `YALA TESTING.jmx`
+
+### 3️⃣ Realizamos la ejecucion
+
+Se observa el rendimiento para `1000` ejecuciones
+
+<div align="center">
+    <img src="./images/01.jpg" alt="" style="width: 80%;">
+</div>
+<div align="center">
+    <img src="./images/02.jpg" alt="" style="width: 80%;">
+</div>
+
+<div align="center">
+    <img src="./images/03.jpg" alt="" style="width: 80%;">
+</div>
+
+Se valida que el servicio ejecute los llamados de las APIS.
+
+<div align="center">
+    <img src="./images/04.jpg" alt="" style="width: 80%;">
+</div>
+
+
+### Validación de Consistencia
+
+#### 📊 Cálculos Esperados
+
+Al final de la ejecución se valida en los depositos:
+
+Si al inicio habia `100` tras ejecutar un deposito de `10` mil veces el valor total de las cuentas deberia de ser `10100`
+
+<div align="center">
+    <img src="./images/05.jpg" alt="" style="width: 80%;">
+</div>
+
+<div align="center">
+    <img src="./images/06.jpg" alt="" style="width: 80%;">
+</div>

@@ -6,6 +6,15 @@ from core.exchange.api2_adapter import CurrencyConverterAPI
 class ExchangeService:
     """Singleton para el servicio de Exchange"""
     _instance = None
+    MOCKED_RATES = {
+        ("PEN", "USD"): 0.27, # 1 PEN = 0.27 USD
+        ("USD", "PEN"): 3.70, # 1 USD = 3.70 PEN (aproximadamente 1/0.27)
+        ("EUR", "USD"): 1.08, # 1 EUR = 1.08 USD
+        ("USD", "EUR"): 0.92, # 1 USD = 0.92 EUR (aproximadamente 1/1.08)
+        ("PEN", "EUR"): 0.25, # Ejemplo: 1 PEN = 0.25 EUR
+        ("EUR", "PEN"): 4.00, # Ejemplo: 1 EUR = 4.00 PEN
+        # Añade más pares si es necesario
+    }
     
     def __new__(cls):
         if cls._instance is None:

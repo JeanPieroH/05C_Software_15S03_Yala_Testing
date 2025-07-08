@@ -1,11 +1,40 @@
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 from typing import Optional
+from pydantic import BaseModel
 
 from database.models import User, Account, Transaction, Currency
 from services.exchange_service import ExchangeService
 from services.email_service import send_transaction_notification
-from pydantic import BaseModel # Importa BaseModel para TransactionCreate
+
+import time
+
+
+# MockExchangeService para simular tasas de cambio
+class MockExchangeService:
+    MOCKED_RATES = {
+        ("PEN", "USD"): 0.27,
+        ("USD", "PEN"): 3.70,
+        ("EUR", "USD"): 1.08,
+        ("USD", "EUR"): 0.92,
+        ("PEN", "EUR"): 0.25,
+        ("EUR", "PEN"): 4.00,
+        ("GBP", "USD"): 1.25,
+        ("JPY", "USD"): 0.0068,
+        ("CAD", "USD"): 0.73,
+        ("AUD", "USD"): 0.66,
+    }
+
+    def get_exchange_rate(self, from_currency_code: str, to_currency_code: str) -> float:
+        time.sleep(0.5)
+        rate = self.MOCKED_RATES.get((from_currency_code, to_currency_code))
+        if rate is None:
+            inverse_rate = self.MOCKED_RATES.get((to_currency_code, from_currency_code))
+            if inverse_rate:
+                return 1 / inverse_rate
+            raise ValueError(f"No hay tasa de cambio mockeada disponible para {from_currency_code} a {to_currency_code}")
+        return rate
+
 
 class TransactionCreate(BaseModel):
     source_account_id: int
@@ -13,10 +42,14 @@ class TransactionCreate(BaseModel):
     amount: float
     description: Optional[str] = None
 
+
 class TransactionService:
-    def __init__(self, db: Session):
+    def __init__(self, db: Session, use_mocked_exchange: bool):
         self.db = db
-        self.exchange_service = ExchangeService()
+        self.use_mocked_exchange = use_mocked_exchange
+        self.exchange_service = (
+            MockExchangeService() if use_mocked_exchange else ExchangeService()
+        )
 
     def create_new_transaction(self, transaction_data: TransactionCreate, current_user: User):
         # Validar cuenta de origen
@@ -35,22 +68,28 @@ class TransactionService:
 
         if not destination_account:
             raise ValueError("La cuenta de destino no existe")
-        
+
         # Validar balance
         if source_account.balance < transaction_data.amount:
             raise ValueError("Balance insuficiente en la cuenta de origen")
 
-        source_currency = self.db.query(Currency).filter(Currency.id == source_account.currency_id).first()
-        destination_currency = self.db.query(Currency).filter(Currency.id == destination_account.currency_id).first()
+        source_currency = self.db.query(Currency).filter(
+            Currency.id == source_account.currency_id
+        ).first()
+        destination_currency = self.db.query(Currency).filter(
+            Currency.id == destination_account.currency_id
+        ).first()
 
         # Calcular monto de destino y tipo de cambio
         if source_currency.code != destination_currency.code:
-            exchange_rate = self.exchange_service.get_exchange_rate(source_currency.code, destination_currency.code)
+            exchange_rate = self.exchange_service.get_exchange_rate(
+                source_currency.code, destination_currency.code
+            )
             destination_amount = transaction_data.amount * exchange_rate
         else:
             exchange_rate = 1.0
             destination_amount = transaction_data.amount
-        
+
         now = datetime.now(timezone.utc)
 
         # Crear nueva transacción
@@ -67,44 +106,40 @@ class TransactionService:
             description=transaction_data.description,
             timestamp=now
         )
-        
+
         # Actualizar balances
         source_account.balance -= transaction_data.amount
         destination_account.balance += destination_amount
-        
+
         self.db.add(new_transaction)
         self.db.commit()
         self.db.refresh(new_transaction)
-        
-        # Enviar notificaciones por correo
-        receiver = self.db.query(User).filter(User.id == destination_account.user_id).first()
-        try:
-            send_transaction_notification(
-                current_user.email,
-                current_user.full_name, 
-                new_transaction, 
-                source_currency.code,
-                destination_currency.code,
-                is_sender=True
-            )
-            
-            send_transaction_notification(
-                receiver.email,
-                receiver.full_name,
-                new_transaction,
-                source_currency.code,
-                destination_currency.code,
-                is_sender=False
-            )
-        except Exception as e:
-            print(f"Error al enviar la notificación: {e}") # Considerar un sistema de logging más robusto
-        
+
+        # Enviar notificaciones por correo (solo si se usa servicio real)
+        if not self.use_mocked_exchange:
+            try:
+                receiver = self.db.query(User).filter(
+                    User.id == destination_account.user_id
+                ).first()
+
+                send_transaction_notification(
+                    current_user.email,
+                    current_user.full_name,
+                    new_transaction,
+                    source_currency.code,
+                    destination_currency.code,
+                    is_sender=True
+                )
+
+            except Exception as e:
+                print(f"Error al enviar la notificación: {e}")  # Usar logging en producción
+
         return new_transaction
 
     def get_user_transactions(self, user_id: int):
         transactions = self.db.query(Transaction).filter(
-            (Transaction.sender_id == user_id) | 
+            (Transaction.sender_id == user_id) |
             (Transaction.receiver_id == user_id)
         ).order_by(Transaction.timestamp.desc()).all()
-        
+
         return transactions

@@ -51,3 +51,31 @@ class AccountService:
         
         send_account_statement(current_user.email, current_user.full_name, account, transactions, format)
         return True # Indica que el envío fue exitoso
+
+    # --- Nuevo método para realizar un depósito ---
+    def deposit_to_account(self, account_id: int, amount: float):
+        """
+        Realiza un depósito a una cuenta específica.
+        """
+        if amount <= 0:
+            raise ValueError("El monto del depósito debe ser positivo.")
+
+        account = self.db.query(Account).filter(Account.id == account_id).first()
+
+        if not account:
+            raise ValueError("Cuenta no encontrada para el depósito.")
+        
+        # Actualizar balance
+        account.balance += amount
+        
+        # Opcional: registrar el depósito como una transacción especial
+        # Esto depende de cómo quieras modelar los depósitos en tu sistema.
+        # Podrías crear un tipo de transacción 'DEPOSIT' o no registrarlo
+        # como una transacción regular entre cuentas si es un ingreso externo.
+        # Por simplicidad, aquí solo actualizamos el balance.
+        
+        self.db.add(account) # Asegurarse de que los cambios sean seguidos
+        self.db.commit()
+        self.db.refresh(account) # Refrescar para obtener el balance actualizado
+        
+        return account # Retorna la cuenta actualizada
