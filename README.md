@@ -155,7 +155,7 @@ Se valida que el servicio ejecute los llamados de las APIS.
 
 Al final de la ejecución se valida en los depositos:
 
-Si al inicio habia `100` tras ejecutar un deposito de `10` mil veces el valor total de las cuentas deberia de ser `10100`
+Si al inicio habia `100` tras ejecutar un deposito de `10` unidades, una cantidad de `1000` veces, entonces el valor total de las cuentas deberia de ser `10100`
 
 <div align="center">
     <img src="./images/05.jpg" alt="" style="width: 80%;">
