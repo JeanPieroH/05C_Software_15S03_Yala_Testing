@@ -1,0 +1,15 @@
+meta {
+  name: Ver Detalles de Cuenta
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:8000/api/accounts/1
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ5QGV4YW1wbGUuY29tIiwiZXhwIjoxNzUxNjgzNzY1fQ.rIDMM0d7MPmyrTbHCqMYzJp-S4-SyA2ix50qOTXFj-U
+}

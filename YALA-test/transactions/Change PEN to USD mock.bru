@@ -1,0 +1,23 @@
+meta {
+  name: Change PEN to USD mock
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:8000/api/transactions/mocked-exchange
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ5QGV4YW1wbGUuY29tIiwiZXhwIjoxNzUxNjg5MTEwfQ.Q5y8qBi_kjLVhR5XzDmaQJKFHwsM9XEjypGbf5uk7ic
+}
+
+body:json {
+  {
+    "source_account_id" : 3,
+    "destination_account_id" : 4,
+    "amount" : 20
+  }
+}

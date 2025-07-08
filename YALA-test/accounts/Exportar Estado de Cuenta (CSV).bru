@@ -1,0 +1,19 @@
+meta {
+  name: Exportar Estado de Cuenta (CSV)
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:8000/api/accounts/1/export?format=csv
+  body: none
+  auth: bearer
+}
+
+params:query {
+  format: csv
+}
+
+auth:bearer {
+  token: {{jwt}}
+}

@@ -1,0 +1,15 @@
+meta {
+  name: Obtener Mi Perfil
+  type: http
+  seq: 1
+}
+
+get {
+  url: http://localhost:8000/api/users/me
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjcGF6QHBydWViYS5jb20iLCJleHAiOjE3NTE2NzgzOTF9.rZgeVR6dnUkozdPAgn8lhRGjgRZCpEm2i0Aca4Hnzu0
+}

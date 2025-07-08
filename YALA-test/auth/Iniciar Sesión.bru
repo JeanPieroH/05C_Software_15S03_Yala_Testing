@@ -1,0 +1,23 @@
+meta {
+  name: Iniciar Sesión
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:8000/api/login
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "cpaz@prueba.com",
+    "password": "password123"
+  }
+}
+
+script:post-response {
+  bru.setEnvVar("jwt", res.body.access_token);
+  
+}

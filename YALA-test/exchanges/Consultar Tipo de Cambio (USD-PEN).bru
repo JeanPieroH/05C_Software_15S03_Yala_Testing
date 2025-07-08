@@ -1,0 +1,11 @@
+meta {
+  name: Consultar Tipo de Cambio (USD/PEN)
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:8000/api/exchange-rates/USD/PEN
+  body: none
+  auth: inherit
+}

@@ -1,0 +1,21 @@
+meta {
+  name: Deposit
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8000/api/accounts/1/deposit
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjcGF6QHBydWViYS5jb20iLCJleHAiOjE3NTE2NzgzOTF9.rZgeVR6dnUkozdPAgn8lhRGjgRZCpEm2i0Aca4Hnzu0
+}
+
+body:json {
+  {
+    "amount": 150.75
+  }
+}

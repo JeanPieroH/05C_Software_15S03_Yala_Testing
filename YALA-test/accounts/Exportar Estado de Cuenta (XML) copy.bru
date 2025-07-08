@@ -1,0 +1,19 @@
+meta {
+  name: Exportar Estado de Cuenta (XML) copy
+  type: http
+  seq: 6
+}
+
+post {
+  url: http://localhost:8000/api/accounts/1/export?format=xml
+  body: none
+  auth: bearer
+}
+
+params:query {
+  format: xml
+}
+
+auth:bearer {
+  token: {{jwt}}
+}
